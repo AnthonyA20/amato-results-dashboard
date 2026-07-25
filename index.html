@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Anthony Amato — Performance Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F6F3EA;
+    --paper-dark:#EDE8DA;
+    --ink:#1A1A1A;
+    --navy:#16213E;
+    --navy-2:#233459;
+    --orange:#FF5A36;
+    --slate:#6B7280;
+    --line:#D8D2C0;
+    --green:#1E7F4F;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'IBM Plex Sans',system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .mono{font-family:'IBM Plex Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums;}
+  .display{font-family:'Archivo Black',system-ui,sans-serif;}
+
+  /* ---------- perforation divider ---------- */
+  .perf{
+    height:18px;
+    background-image:radial-gradient(circle 5px, var(--paper) 5px, transparent 5.5px);
+    background-size:24px 24px;
+    background-position:8px 0px;
+    background-color:var(--navy);
+    position:relative;
+  }
+  .perf.light{background-color:var(--paper-dark);}
+  .perf.flip{transform:rotate(180deg);}
+
+  /* ---------- header / bib ---------- */
+  header.bib{
+    background:var(--navy);
+    color:var(--paper);
+    padding:36px 5vw 30px;
+    position:relative;
+  }
+  .bib-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    flex-wrap:wrap;
+    gap:20px;
+  }
+  .bib-eyebrow{
+    font-family:'IBM Plex Mono',monospace;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    font-size:12px;
+    color:#9FB0D6;
+    margin:0 0 6px;
+  }
+  h1.bib-name{
+    font-family:'Archivo Black',system-ui,sans-serif;
+    font-size:clamp(34px,5vw,58px);
+    line-height:1.02;
+    margin:0;
+    letter-spacing:-0.01em;
+  }
+  .bib-sub{
+    color:#C7D0E6;
+    font-size:15px;
+    margin-top:10px;
+    max-width:560px;
+    line-height:1.5;
+  }
+  .bib-number{
+    font-family:'Archivo Black',system-ui,sans-serif;
+    font-size:clamp(46px,7vw,84px);
+    color:var(--orange);
+    line-height:1;
+    text-align:right;
+  }
+  .bib-number-label{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    letter-spacing:.15em;
+    text-transform:uppercase;
+    color:#9FB0D6;
+    text-align:right;
+    margin-top:4px;
+  }
+  .stat-strip{
+    display:flex;
+    gap:0;
+    margin-top:28px;
+    border-top:1px dashed #3E4E76;
+    padding-top:18px;
+    flex-wrap:wrap;
+  }
+  .stat-strip .stat{
+    flex:1 1 140px;
+    padding:0 20px;
+    border-left:1px dashed #3E4E76;
+  }
+  .stat-strip .stat:first-child{border-left:none;padding-left:0;}
+  .stat .num{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:26px;color:var(--paper);}
+  .stat .lbl{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#9FB0D6;margin-top:2px;}
+
+  main{max-width:1180px;margin:0 auto;padding:0 5vw 80px;}
+
+  section.block{margin-top:52px;}
+  .section-head{
+    display:flex;
+    align-items:baseline;
+    gap:14px;
+    margin-bottom:6px;
+  }
+  .section-tag{
+    font-family:'IBM Plex Mono',monospace;
+    background:var(--orange);
+    color:var(--paper);
+    font-size:11px;
+    letter-spacing:.12em;
+    padding:3px 8px;
+    border-radius:2px;
+    text-transform:uppercase;
+    font-weight:600;
+  }
+  h2.section-title{
+    font-family:'Archivo Black',system-ui,sans-serif;
+    font-size:26px;
+    margin:0;
+    letter-spacing:-0.01em;
+  }
+  .section-note{
+    color:var(--slate);
+    font-size:14px;
+    max-width:720px;
+    margin:8px 0 26px;
+    line-height:1.55;
+  }
+
+  /* ---------- bib cards ---------- */
+  .card-row{display:flex;gap:18px;flex-wrap:wrap;margin-bottom:8px;}
+  .bibcard{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:4px;
+    padding:18px 20px;
+    position:relative;
+    flex:1 1 220px;
+  }
+  .bibcard::before{
+    content:"";
+    position:absolute; left:-6px; top:50%; transform:translateY(-50%);
+    width:12px; height:12px; border-radius:50%;
+    background:var(--paper); border:1px solid var(--line);
+  }
+  .bibcard::after{
+    content:"";
+    position:absolute; right:-6px; top:50%; transform:translateY(-50%);
+    width:12px; height:12px; border-radius:50%;
+    background:var(--paper); border:1px solid var(--line);
+  }
+  .bibcard .k{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--slate);}
+  .bibcard .v{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:28px;margin-top:4px;}
+  .bibcard .v small{font-size:14px;font-weight:500;color:var(--slate);margin-left:4px;}
+  .bibcard.hero{background:var(--navy);color:var(--paper);border-color:var(--navy);}
+  .bibcard.hero .k{color:#9FB0D6;}
+  .bibcard.hero .v{color:var(--orange);}
+  .bibcard.hero .v small{color:#C7D0E6;}
+
+  /* ---------- personal bests grid ---------- */
+  .pb-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px;}
+  .pbcard{
+    background:#fff;border:1px solid var(--line);border-radius:4px;
+    padding:16px 18px;position:relative;
+  }
+  .pbcard-cat{
+    font-family:'IBM Plex Mono',monospace;background:var(--navy);color:var(--paper);
+    display:inline-block;font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+    padding:2px 7px;border-radius:2px;margin-bottom:10px;
+  }
+  .pbcard-name{font-size:13.5px;font-weight:600;line-height:1.3;min-height:34px;}
+  .pbcard-date{font-size:11.5px;color:var(--slate);margin-top:2px;}
+  .pbcard-time{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:26px;margin-top:8px;color:var(--navy);}
+  .pbcard-time small{font-size:13px;font-weight:500;color:var(--slate);margin-left:4px;font-family:'IBM Plex Mono',monospace;}
+  .pbcard-meta{
+    display:flex;flex-wrap:wrap;gap:8px 14px;margin-top:10px;
+    font-size:11.5px;color:var(--slate);border-top:1px dashed var(--line);padding-top:8px;
+  }
+  .pbcard-meta b{color:var(--ink);}
+
+  /* ---------- distance chip filters ---------- */
+  .chip-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
+  .chip{
+    font-family:'IBM Plex Mono',monospace;font-size:12px;padding:6px 13px;
+    border:1px solid var(--line);border-radius:20px;background:#fff;
+    cursor:pointer;color:var(--slate);letter-spacing:.03em;
+  }
+  .chip:hover{border-color:var(--navy);color:var(--ink);}
+  .chip.active{background:var(--navy);color:var(--paper);border-color:var(--navy);}
+
+  /* ---------- tables ---------- */
+  table{width:100%;border-collapse:collapse;background:#fff;}
+  thead th{
+    text-align:left;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    color:var(--slate);
+    font-weight:600;
+    padding:10px 12px;
+    border-bottom:2px solid var(--ink);
+    white-space:nowrap;
+  }
+  thead th .range{
+    display:block;
+    font-size:10px;
+    text-transform:none;
+    letter-spacing:0;
+    font-weight:500;
+    color:var(--slate);
+    opacity:.8;
+    margin-top:2px;
+  }
+  tbody td{
+    padding:10px 12px;
+    border-bottom:1px solid var(--line);
+    font-size:14.5px;
+    vertical-align:middle;
+  }
+  tbody tr:hover{background:var(--paper-dark);}
+  td.mono, th.mono{font-family:'IBM Plex Mono',monospace;}
+  .better{position:relative;font-weight:700;color:var(--green);}
+  .better::after{content:"▲";font-size:9px;margin-left:5px;position:relative;top:-1px;}
+  .table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:4px;}
+
+  .pr-badge{
+    display:inline-flex;align-items:center;gap:4px;
+    background:var(--orange);color:#fff;font-family:'IBM Plex Mono',monospace;
+    font-size:10px;font-weight:700;letter-spacing:.05em;
+    padding:2px 6px;border-radius:2px;margin-left:8px;white-space:nowrap;
+  }
+  .src-dot{
+    display:inline-block;width:7px;height:7px;border-radius:50%;margin-left:7px;
+    position:relative;top:-1px;cursor:help;
+  }
+  .src-dot.icu{background:#3E7CB1;}
+  .src-dot.mix{background:#9B6EC8;}
+  .src-dot.none{background:#C9C2AC;border:1px solid var(--slate);}
+
+  /* ---------- controls ---------- */
+  .controls{
+    display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;align-items:center;
+  }
+  .controls input[type=text]{
+    font-family:'IBM Plex Sans',sans-serif;
+    padding:9px 12px;border:1px solid var(--line);border-radius:4px;
+    font-size:14px;min-width:220px;background:#fff;
+  }
+  .controls select{
+    font-family:'IBM Plex Sans',sans-serif;
+    padding:9px 12px;border:1px solid var(--line);border-radius:4px;
+    font-size:14px;background:#fff;
+  }
+  .controls .count{font-size:13px;color:var(--slate);margin-left:auto;}
+  th.sortable{cursor:pointer;user-select:none;}
+  th.sortable:hover{color:var(--ink);}
+  th.sortable .arrow{opacity:.35;margin-left:3px;}
+  th.sortable.active .arrow{opacity:1;color:var(--orange);}
+
+  .legend{
+    display:flex;gap:18px;flex-wrap:wrap;
+    font-size:12.5px;color:var(--slate);margin:14px 2px 0;
+  }
+  .legend span{display:inline-flex;align-items:center;gap:6px;}
+
+  footer{
+    border-top:1px dashed var(--line);
+    margin-top:60px;padding:26px 5vw 50px;
+    color:var(--slate);font-size:12.5px;line-height:1.7;
+    max-width:1180px;margin-left:auto;margin-right:auto;
+  }
+  footer b{color:var(--ink);}
+
+  @media (max-width:640px){
+    .bib-top{flex-direction:column;}
+    .bib-number{text-align:left;}
+    .bib-number-label{text-align:left;}
+  }
+</style>
+</head>
+<body>
+
+<header class="bib">
+  <div class="bib-top">
+    <div>
+      <p class="bib-eyebrow">Performance Dashboard · Intervals.icu</p>
+      <h1 class="bib-name">ANTHONY<br>AMATO</h1>
+      <p class="bib-sub">Rebuilt from the TrainingPeaks dashboard widgets, now that eleven years of history (2015–2026) live in Intervals.icu. Peak-performance numbers confirmed directly against Intervals' native Pace &amp; Power curves; race results cross-checked against imported activity files.</p>
+    </div>
+    <div>
+      <div class="bib-number" id="bib-hero-num">—</div>
+      <div class="bib-number-label" id="bib-hero-lbl">best age-graded performance</div>
+    </div>
+  </div>
+  <div class="stat-strip">
+    <div class="stat"><div class="num">67</div><div class="lbl">Races logged, 2015–2026</div></div>
+    <div class="stat"><div class="num">5,737</div><div class="lbl">Total activities imported</div></div>
+    <div class="stat"><div class="num" id="stat-marathon">—</div><div class="lbl" id="stat-marathon-lbl">Marathon PR</div></div>
+    <div class="stat"><div class="num" id="stat-half">—</div><div class="lbl" id="stat-half-lbl">Half PR</div></div>
+    <div class="stat"><div class="num" id="snapshot-date">—</div><div class="lbl">Data confirmed</div></div>
+  </div>
+</header>
+<div class="perf"></div>
+
+<main>
+
+  <section class="block">
+    <div class="section-head"><span class="section-tag">01</span><h2 class="section-title">Personal Bests</h2></div>
+    <p class="section-note">Fastest confirmed time on record in every race distance you've run, 2015–2026 — mirrors the Personal Bests view on your NYRR runner profile, with placing (Overall / Gender / Age-Group) and age-graded percentage pulled from the same official-results cross-reference used in Race Reports below.</p>
+    <div class="pb-grid" id="pb-grid"></div>
+  </section>
+
+  <div class="perf light"></div>
+
+  <section class="block">
+    <div class="section-head"><span class="section-tag">02</span><h2 class="section-title">Peak Performance — Run</h2></div>
+    <p class="section-note">Peak pace by distance, straight from Intervals' native Pace Curves page (critical-speed model). Two columns replicate TrainingPeaks' "ALL vs LAST 365" comparison — Intervals splits it as <b>Last 365 Days</b> and an <b>All Time</b> season starting Jan 1, 2015. The faster of the two is marked.</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Distance</th><th class="mono">Last 365 Days<br><span class="range" id="l365-range"></span></th><th class="mono">All-Time<br><span class="range" id="alltime-range"></span></th></tr>
+        </thead>
+        <tbody id="pace-table"></tbody>
+      </table>
+    </div>
+    <div class="legend"><span>▲ green = faster of the two columns</span><span>* 400m all-time value looks like a GPS/data blip, reported as computed</span></div>
+  </section>
+
+  <div class="perf light"></div>
+
+  <section class="block">
+    <div class="section-head"><span class="section-tag">03</span><h2 class="section-title">Race Reports</h2></div>
+    <p class="section-note">All 67 races from the original TrainingPeaks Race Reports widget, 2015–2026, cross-referenced against your official New York Road Runners results export — 57 of 67 are NYRR-scored races and now carry a verified <b>Official Result</b> (chip time, Overall / Gender / Age-Group place, age-graded time). Where TrainingPeaks had no duration/distance on file, the "My Time" column is filled from the matching imported activity file (blue dot). The Chicago Marathon (10/7/2018) was registered but never run, so there's no result — not an export gap. The Central Park Duathlon total sums three run + two bike segments recorded that morning.</p>
+
+    <div class="chip-row" id="chip-row"></div>
+    <div class="controls">
+      <input type="text" id="search" placeholder="Search race name…">
+      <select id="year-filter"><option value="">All years</option></select>
+      <span class="count" id="row-count"></span>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th class="sortable" data-key="date">Date <span class="arrow">↕</span></th>
+            <th class="sortable" data-key="name">Race <span class="arrow">↕</span></th>
+            <th class="sortable" data-key="category">Distance <span class="arrow">↕</span></th>
+            <th class="sortable mono" data-key="sec">My Time <span class="arrow">↕</span></th>
+            <th class="sortable mono" data-key="pace">Pace /mi <span class="arrow">↕</span></th>
+            <th class="sortable mono" data-key="offsec">Official Result <span class="arrow">↕</span></th>
+            <th class="sortable" data-key="offplace">Placing (O / G / AG) <span class="arrow">↕</span></th>
+            <th class="sortable mono" data-key="agpct">Age-Graded <span class="arrow">↕</span></th>
+          </tr>
+        </thead>
+        <tbody id="race-table"></tbody>
+      </table>
+    </div>
+    <div class="legend">
+      <span><span class="pr-badge">PR</span> fastest on record for that distance</span>
+      <span><span class="src-dot icu"></span> My Time filled from Intervals (TP had no data)</span>
+      <span><span class="src-dot mix"></span> duration from TP, distance from Intervals</span>
+      <span><span class="src-dot none"></span> registered but not run — no result</span>
+      <span>Official Result, Placing &amp; Age-Graded columns are sourced from your NYRR results export — dash means not an NYRR-scored race</span>
+    </div>
+  </section>
+
+  <div class="perf light"></div>
+
+  <section class="block">
+    <div class="section-head"><span class="section-tag">04</span><h2 class="section-title">Peak Performance — Bike</h2></div>
+    <p class="section-note">No rides logged in the last 365 days, so this is all-time only — no "recent vs. all-time" split like Run has. Peak HR is a simple highest-ever reading (Intervals has no HR-duration-curve feature the way it does for pace/power), sourced from the 25 highest-intensity rides on file.</p>
+    <div class="card-row">
+      <div class="bibcard"><div class="k">5 sec power</div><div class="v">519<small>W</small></div></div>
+      <div class="bibcard"><div class="k">60 sec power</div><div class="v">299<small>W</small></div></div>
+      <div class="bibcard"><div class="k">5 min power</div><div class="v">215<small>W</small></div></div>
+      <div class="bibcard"><div class="k">20 min power</div><div class="v">188<small>W</small></div></div>
+      <div class="bibcard"><div class="k">Est. FTP</div><div class="v">179<small>W</small></div></div>
+      <div class="bibcard hero"><div class="k">Peak heart rate</div><div class="v">173<small>bpm</small></div></div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <p><b>Methodology.</b> Run and Bike peak-performance figures are read directly from Intervals.icu's Pace Curves and Power Curves pages using a custom "All Time" season (Jan 1, 2015 start). "My Time"/distance in Race Reports combine the original TrainingPeaks race log with the matching imported activity file, used only to fill gaps TrainingPeaks itself was missing. Official Result, Placing, and Age-Graded come from your New York Road Runners results export and are matched by date first, then by name and finish-time proximity for the same year. One date correction was made this way: TrainingPeaks listed "Abbott Dash to the Finish Line 5K" under 7/4/2023, but NYRR's official record — and a matching Intervals activity — puts it on 11/4/2023 (marathon week), so the date shown here has been corrected.</p>
+  <p><b>Known limitations.</b> Intervals.icu has no duration-based heart-rate curve (only Pace and Power support that), so Bike peak HR is a simple maximum rather than a true curve. This is a snapshot as of the date above, not a live feed — Intervals' curve computations aren't exposed through a CORS-enabled API, so refreshing requires re-running this confirmation pass. NYRR Gridiron 4M, 2/12/2023, has no matching entry in the NYRR export because it was run unregistered (bandit), not an NYRR-scored entry — expected, not a data error. Every race date was checked against the full Intervals activity history; the NYRR R-U-N 5K on 8/6/2015 was the one true gap found, and it's now resolved. Its device file wasn't missing because of anything in the dedup or upload pipeline — a different day's workout (8/7/2015) had silently overwritten it under the same generated export filename in the original raw TrainingPeaks archive, so the true 8/6 file was never in that archive to begin with. You downloaded the correct file directly from TrainingPeaks, it was converted and uploaded, and it's now confirmed live in Intervals (Afternoon Run, 8/6/2015, 28:33, 3.15mi). No other gaps of this kind were found across the other 66 races.</p>
+</footer>
+
+<script>
+const RACES = [{"date":"2015-08-06","name":"NYRR R-U-N 5K Race","sec":1696,"mi":3.11,"placing":"","source":"TP","category":"5K","pr":false,"official":{"name":"2015 R-U-N 5K","date":"2015-08-06","sec":1696,"overall":2521,"gender":1548,"agegroup":203,"agtime":1595,"agpct":0.49}},{"date":"2015-08-22","name":"NYRR Percy Sutton Harlem 5K Race","sec":1651,"mi":3.19,"placing":"","source":"TP","category":"5K","pr":false,"official":{"name":"Percy Sutton Harlem 5K Run","date":"2015-08-22","sec":1648,"overall":2109,"gender":1499,"agegroup":201,"agtime":1550,"agpct":0.5}},{"date":"2015-08-29","name":"France Run 8K Race","sec":2873,"mi":4.97,"placing":"","source":"TP","category":"8K","pr":true,"official":{"name":"2015 France Run 8k","date":"2015-08-29","sec":2873,"overall":3023,"gender":1880,"agegroup":295,"agtime":2732,"agpct":0.47}},{"date":"2015-09-13","name":"NYRR Fifth Ave Mile Race","sec":432,"mi":1.01,"placing":"","source":"TP","category":"Mile","pr":false,"official":{"name":"2015 Fifth Avenue Mile","date":"2015-09-13","sec":434,"overall":3692,"gender":2682,"agegroup":348,"agtime":407,"agpct":0.55}},{"date":"2015-09-27","name":"NYRR Five Borough Series Bronx 10-Mile Race","sec":5791,"mi":10.13,"placing":"","source":"ICU","category":"10M","pr":false,"official":{"name":"NYRR Five-Borough Series: Bronx 10-Mile","date":"2015-09-27","sec":5844,"overall":5862,"gender":3789,"agegroup":666,"agtime":5625,"agpct":0.4694}},{"date":"2015-10-04","name":"Memorial Sloan Kettering's Fred's Team Presents Grete's Great Gallop (13.1M) Race","sec":7860,"mi":13.1,"placing":"","source":"TP","category":"Half","pr":false,"official":{"name":"2015 Memorial Sloan Kettering's Fred's Team Presents Grete's Great Gallop (13.1M)","date":"2015-10-04","sec":7947,"overall":3107,"gender":1820,"agegroup":292,"agtime":7676,"agpct":0.4564}},{"date":"2015-10-25","name":"Poland Spring Marathon Kick-Off (5M) Race","sec":2709,"mi":5.0,"placing":"","source":"TP","category":"5M","pr":false,"official":{"name":"2015 Poland Spring Marathon Kickoff (5M)","date":"2015-10-25","sec":2709,"overall":2041,"gender":1323,"agegroup":195,"agtime":2522,"agpct":0.51}},{"date":"2015-11-22","name":"Race to Deliver 4M","sec":2042,"mi":4.0,"placing":"","source":"TP","category":"4M","pr":false,"official":{"name":"2015 Race to Deliver","date":"2015-11-22","sec":2042,"overall":1578,"gender":1101,"agegroup":152,"agtime":1917,"agpct":0.53}},{"date":"2015-12-05","name":"NYRR Jingle Bell Jog (4M) Race","sec":2031,"mi":4.0,"placing":"","source":"TP","category":"4M","pr":false,"official":{"name":"2015 Jingle Bell Jog","date":"2015-12-05","sec":2031,"overall":1287,"gender":865,"agegroup":114,"agtime":1891,"agpct":0.53}},{"date":"2016-01-09","name":"NYRR Joe Kleinerman 10K","sec":3196,"mi":6.21,"placing":"","source":"TP","category":"10K","pr":false,"official":{"name":"2016 NYRR Joe Kleinerman 10K","date":"2016-01-09","sec":3196,"overall":1997,"gender":1489,"agegroup":233,"agtime":3033,"agpct":0.5286}},{"date":"2016-02-07","name":"NYRR Gridiron 4M","sec":1971,"mi":4.0,"placing":"","source":"TP","category":"4M","pr":false,"official":{"name":"2016 Gridiron 4M","date":"2016-02-07","sec":1971,"overall":1652,"gender":1235,"agegroup":197,"agtime":1851,"agpct":0.5481}},{"date":"2016-03-20","name":"NYC Half Marathon","sec":7183,"mi":13.1,"placing":"","source":"TP","category":"Half","pr":false,"official":{"name":"United Airlines NYC Half 2016","date":"2016-03-20","sec":7183,"overall":8862,"gender":5637,"agegroup":897,"agtime":6884,"agpct":0.5089}},{"date":"2016-04-02","name":"Scotland Run (10K)","sec":3162,"mi":6.21,"placing":"","source":"TP","category":"10K","pr":false,"official":{"name":"2016 Scotland Run 10K","date":"2016-04-02","sec":3162,"overall":3011,"gender":2265,"agegroup":363,"agtime":3001,"agpct":0.5342}},{"date":"2016-05-21","name":"Brooklyn Half Marathon","sec":7429,"mi":13.1,"placing":"","source":"TP","category":"Half","pr":false,"official":{"name":"Airbnb Brooklyn Half Marathon 2016","date":"2016-05-21","sec":7429,"overall":13770,"gender":8374,"agegroup":1013,"agtime":7120,"agpct":0.492}},{"date":"2016-06-05","name":"NYRR Retro 4-Miler","sec":2079,"mi":4.0,"placing":"","source":"TP","category":"4M","pr":false,"official":{"name":"NYRR Retro 4-Miler","date":"2016-06-05","sec":2079,"overall":2408,"gender":1734,"agegroup":277,"agtime":1952,"agpct":0.5196}},{"date":"2016-06-18","name":"Queens 10K","sec":3221,"mi":6.21,"placing":"","source":"TP","category":"10K","pr":false,"official":{"name":"2016 NYRR Five-Borough Series: Queens 10K","date":"2016-06-18","sec":3221,"overall":3128,"gender":2486,"agegroup":378,"agtime":3057,"agpct":0.5245}},{"date":"2016-07-09","name":"Shipyard Old Port Half Marathon","sec":7201,"mi":13.1,"placing":"","source":"TP","category":"Half","pr":false,"official":null},{"date":"2016-08-27","name":"Percy Sutton Harlem 5K Run","sec":1652,"mi":3.11,"placing":"","source":"TP","category":"5K","pr":false,"official":{"name":"2016 Percy Sutton Harlem 5K Run","date":"2016-08-27","sec":1652,"overall":2263,"gender":1576,"agegroup":191,"agtime":1542,"agpct":0.5052}},{"date":"2016-09-08","name":"Shoe4Africa 5k","sec":1579,"mi":3.11,"placing":"","source":"TP","category":"5K","pr":false,"official":null},{"date":"2016-09-25","name":"Bronx 10 Mile","sec":5497,"mi":10.0,"placing":"","source":"TP","category":"10M","pr":false,"official":{"name":"2016 New Balance Bronx 10-Mile","date":"2016-09-25","sec":5497,"overall":5535,"gender":3801,"agegroup":591,"agtime":5249,"agpct":0.503}},{"date":"2016-10-09","name":"NYRR Staten Island Half","sec":7420,"mi":13.1,"placing":"","source":"TP","category":"Half","pr":false,"official":{"name":"2016 NYRR Staten Island Half","date":"2016-10-09","sec":7420,"overall":5590,"gender":3948,"agegroup":559,"agtime":7112,"agpct":0.4926}},{"date":"2016-11-06","name":"New York City Marathon","sec":16404,"mi":26.2,"placing":"","source":"TP","category":"Marathon","pr":false,"official":{"name":"TCS New York City Marathon 2016","date":"2016-11-06","sec":16404,"overall":26393,"gender":17987,"agegroup":3347,"agtime":15530,"agpct":0.475}},{"date":"2017-02-05","name":"NYRR Gridiron 4M","sec":1896,"mi":4.0,"placing":"","source":"TP","category":"4M","pr":false,"official":{"name":"2017 NYRR  Gridiron 4M","date":"2017-02-05","sec":1896,"overall":1182,"gender":937,"agegroup":149,"agtime":1767,"agpct":0.5741}},{"date":"2017-03-05","name":"NYRR Washington Heights Salsa, Blues, and Shamrocks 5K","sec":1428,"mi":3.11,"placing":"","source":"TP","category":"5K","pr":true,"official":{"name":"NYRR Washington Heights Salsa, Blues, and Shamrocks 5K","date":"2017-03-05","sec":1428,"overall":1158,"gender":926,"agegroup":129,"agtime":1323,"agpct":0.5889}},{"date":"2017-03-19","name":"NYC Half","sec":6850,"mi":13.1,"placing":"","source":"TP","category":"Half","pr":false,"official":{"name":"2017 United Airlines NYC Half","date":"2017-03-19","sec":6850,"overall":6150,"gender":4212,"agegroup":616,"agtime":6512,"agpct":0.538}},{"date":"2017-04-09","name":"UAE 10K","sec":2941,"mi":6.21,"placing":"","source":"TP","category":"10K","pr":false,"official":{"name":"2017 UAE Healthy Kidney 10K","date":"2017-04-09","sec":2941,"overall":1931,"gender":1580,"agegroup":205,"agtime":2769,"agpct":0.5789}},{"date":"2017-05-20","name":"Brooklyn Half","sec":6580,"mi":13.1,"placing":"","source":"TP","category":"Half","pr":false,"official":{"name":"2017 Airbnb Brooklyn Half Marathon","date":"2017-05-20","sec":6580,"overall":7033,"gender":5251,"agegroup":664,"agtime":6255,"agpct":0.5601}},{"date":"2017-06-17","name":"NYRR Five Borough Series Queens 10K","sec":2899,"mi":6.21,"placing":"","source":"TP","category":"10K","pr":true,"official":{"name":"2017 NYRR Queens 10K","date":"2017-06-17","sec":2899,"overall":2000,"gender":1689,"agegroup":252,"agtime":2730,"agpct":0.5872}},{"date":"2017-08-05","name":"Team Championships","sec":2509,"mi":5.0,"placing":"","source":"TP","category":"5M","pr":false,"official":{"name":"2017 NYRR Team Championships: Men (5M)","date":"2017-08-05","sec":2509,"overall":848,"gender":848,"agegroup":118,"agtime":2350,"agpct":0.5444}},{"date":"2017-08-26","name":"Percy Sutton Harlem 5K","sec":1439,"mi":3.11,"placing":"","source":"TP","category":"5K","pr":false,"official":{"name":"2017 Percy Sutton Harlem 5K Run","date":"2017-08-26","sec":1439,"overall":1333,"gender":1055,"agegroup":140,"agtime":1334,"agpct":0.5843}},{"date":"2017-09-04","name":"New Haven Half Marathon","sec":6625,"mi":13.1,"placing":"","source":"TP","category":"Half","pr":false,"official":null},{"date":"2017-09-10","name":"5th Avenue Mile","sec":389,"mi":1.0,"placing":"","source":"TP","category":"Mile","pr":true,"official":{"name":"2017 New Balance 5th Avenue Mile","date":"2017-09-10","sec":389,"overall":2836,"gender":2291,"agegroup":252,"agtime":360,"agpct":0.6197}},{"date":"2017-09-24","name":"NYRR Bronx 10M","sec":5172,"mi":10.0,"placing":"","source":"TP","category":"10M","pr":true,"official":{"name":"2017 New Balance Bronx 10-Mile","date":"2017-09-24","sec":5172,"overall":3892,"gender":3007,"agegroup":431,"agtime":4899,"agpct":0.539}},{"date":"2017-10-08","name":"NYRR Staten Island Half","sec":7256,"mi":13.1,"placing":"","source":"TP","category":"Half","pr":false,"official":{"name":"2017 NYRR Staten Island Half","date":"2017-10-08","sec":7256,"overall":3932,"gender":2943,"agegroup":418,"agtime":6898,"agpct":0.5079}},{"date":"2017-11-05","name":"2017 TCS New York City Marathon","sec":15182,"mi":26.2,"placing":"","source":"TP","category":"Marathon","pr":true,"official":{"name":"TCS New York City Marathon 2017","date":"2017-11-05","sec":15182,"overall":18617,"gender":13504,"agegroup":2599,"agtime":14314,"agpct":0.5154}},{"date":"2017-12-09","name":"Ted Corbitt 15K","sec":4678,"mi":9.32,"placing":"","source":"TP","category":"15K","pr":true,"official":{"name":"2017 NYRR Ted Corbitt 15K","date":"2017-12-09","sec":4678,"overall":1464,"gender":1075,"agegroup":165,"agtime":4391,"agpct":0.5592}},{"date":"2018-01-21","name":"NYRR Fred Lebow Manhattan Half","sec":6598,"mi":13.1,"placing":"","source":"TP","category":"Half","pr":false,"official":{"name":"2018 NYRR Fred Lebow Manhattan Half","date":"2018-01-21","sec":6598,"overall":1241,"gender":1036,"agegroup":169,"agtime":6221,"agpct":0.5631}},{"date":"2018-02-04","name":"Gridiron 4M","sec":1835,"mi":4.0,"placing":"","source":"TP","category":"4M","pr":true,"official":{"name":"2018 NYRR Gridiron 4M","date":"2018-02-04","sec":1835,"overall":852,"gender":695,"agegroup":100,"agtime":1697,"agpct":0.5978}},{"date":"2018-02-25","name":"Tokyo Marathon","sec":19988,"mi":26.92,"placing":"","source":"ICU","category":"Marathon","pr":false,"official":null},{"date":"2018-05-19","name":"NYRR Brooklyn Half","sec":6873,"mi":13.3,"placing":"","source":"TP","category":"Half","pr":false,"official":{"name":"2018 Popular Brooklyn Half","date":"2018-05-19","sec":6874,"overall":9005,"gender":6425,"agegroup":843,"agtime":6481,"agpct":0.5406}},{"date":"2018-06-03","name":"NYRR Italy 5 miler","sec":2416,"mi":5.08,"placing":"","source":"ICU","category":"5M","pr":true,"official":{"name":"2018 Italy Run by Ferrero (5M)","date":"2018-06-03","sec":2417,"overall":1872,"gender":1515,"agegroup":222,"agtime":2246,"agpct":0.5696}},{"date":"2018-06-16","name":"Queens 10K","sec":3086,"mi":6.33,"placing":"","source":"ICU","category":"10K","pr":false,"official":{"name":"2018 NYRR Queens 10K","date":"2018-06-16","sec":3088,"overall":3198,"gender":2586,"agegroup":373,"agtime":2885,"agpct":0.5557}},{"date":"2018-07-26","name":"NYRR R-U-N 5K","sec":1433,"mi":3.15,"placing":"","source":"ICU","category":"5K","pr":false,"official":{"name":"NYRR R-U-N 5K","date":"2018-07-26","sec":1434,"overall":816,"gender":659,"agegroup":90,"agtime":1320,"agpct":0.5904}},{"date":"2018-07-28","name":"NYRR Team Championships (5M)","sec":2620,"mi":5.07,"placing":"","source":"ICU","category":"5M","pr":false,"official":{"name":"2018 NYRR Team Championships","date":"2018-07-28","sec":2622,"overall":1442,"gender":958,"agegroup":120,"agtime":2437,"agpct":0.5249}},{"date":"2018-10-07","name":"Chicago Marathon","sec":null,"mi":null,"placing":"","source":"none","category":"Marathon","pr":false,"official":null},{"date":"2019-02-03","name":"NYRR Gridiron 4M","sec":2061,"mi":4.05,"placing":"","source":"ICU","category":"4M","pr":false,"official":{"name":"2019 NYRR Gridiron 4M","date":"2019-02-03","sec":2056,"overall":1790,"gender":1273,"agegroup":188,"agtime":1887,"agpct":0.5374}},{"date":"2019-03-17","name":"NYC Half","sec":7006,"mi":13.3,"placing":"","source":"ICU","category":"Half","pr":false,"official":{"name":"2019 United Airlines NYC Half","date":"2019-03-17","sec":7004,"overall":8988,"gender":6130,"agegroup":761,"agtime":6522,"agpct":0.5372}},{"date":"2019-04-07","name":"Cherry Blossom 10 Mile Run","sec":5581,"mi":10.06,"placing":"","source":"ICU","category":"10M","pr":false,"official":null},{"date":"2019-04-28","name":"UAE Healthy Kidney 10K","sec":3049,"mi":6.31,"placing":"","source":"ICU","category":"10K","pr":false,"official":{"name":"2019 UAE Healthy Kidney 10K","date":"2019-04-28","sec":3046,"overall":2185,"gender":1772,"agegroup":197,"agtime":2823,"agpct":0.568}},{"date":"2019-05-18","name":"Brooklyn Half","sec":6509,"mi":13.2,"placing":"","source":"TP","category":"Half","pr":true,"official":{"name":"2019 Popular Brooklyn Half","date":"2019-05-18","sec":6508,"overall":6273,"gender":4822,"agegroup":451,"agtime":6085,"agpct":0.5757}},{"date":"2019-06-15","name":"Queens 10K","sec":3391,"mi":6.21,"placing":"","source":"TP","category":"10K","pr":false,"official":{"name":"2019 NYRR Queens 10K","date":"2019-06-15","sec":3389,"overall":5481,"gender":3917,"agegroup":464,"agtime":3140,"agpct":0.5105}},{"date":"2019-09-29","name":"Bronx 10 Mile","sec":6184,"mi":10.1,"placing":"","source":"ICU","category":"10M","pr":false,"official":{"name":"2019 New Balance Bronx 10-Mile","date":"2019-09-29","sec":6235,"overall":8242,"gender":5019,"agegroup":609,"agtime":5810,"agpct":0.4544}},{"date":"2019-10-20","name":"Central Park Duathlon","sec":6396,"mi":4.77,"placing":"","source":"ICU-partial","category":"Other","pr":false,"official":null},{"date":"2023-01-07","name":"NYRR Joe Kleinerman 10K","sec":3297,"mi":6.21,"placing":"","source":"TP","category":"10K","pr":false,"official":{"name":"2023 NYRR Joe Kleinerman 10K","date":"2023-01-07","sec":3297,"overall":2391,"gender":1706,"agegroup":202,"agtime":2954,"agpct":0.5427}},{"date":"2023-02-12","name":"NYRR Gridiron 4M","sec":1971,"mi":4.1,"placing":"","source":"ICU","category":"4M","pr":false,"official":null},{"date":"2023-03-05","name":"NYRR Washington Heights Salsa, Blues and Shamrocks 5K","sec":1512,"mi":3.16,"placing":"","source":"TP+ICU","category":"5K","pr":false,"official":{"name":"2023 NYRR Washington Heights Salsa, Blues, and Shamrocks 5K","date":"2023-03-05","sec":1512,"overall":1677,"gender":1284,"agegroup":129,"agtime":1341,"agpct":0.5812}},{"date":"2023-04-23","name":"RBC Race for the Kids 4M","sec":1902,"mi":4.0,"placing":"793/2676","source":"TP","category":"4M","pr":false,"official":{"name":"2023 RBC Race for the Kids 4M Presented by NYRR","date":"2023-04-23","sec":1902,"overall":1408,"gender":1124,"agegroup":95,"agtime":1692,"agpct":0.5994}},{"date":"2023-05-20","name":"Brooklyn Half","sec":7195,"mi":13.3,"placing":"761/1431","source":"TP","category":"Half","pr":false,"official":{"name":"2023 RBC Brooklyn Half","date":"2023-05-20","sec":7135,"overall":11061,"gender":7684,"agegroup":761,"agtime":6422,"agpct":0.5455}},{"date":"2023-09-17","name":"Bronx 10 miler","sec":6374,"mi":9.95,"placing":"","source":"ICU","category":"10M","pr":false,"official":{"name":"2023 New Balance Bronx 10M","date":"2023-09-17","sec":6369,"overall":8772,"gender":5430,"agegroup":616,"agtime":5723,"agpct":0.4614}},{"date":"2023-11-04","name":"Abbott Dash to the Finish Line 5K","sec":1473,"mi":3.11,"placing":"76/452","source":"TP","category":"5K","pr":false,"official":{"name":"2023 Abbott Dash to the Finish Line 5K and USATF Championships","date":"2023-11-04","sec":1473,"overall":1702,"gender":1231,"agegroup":77,"agtime":1295,"agpct":0.6016}},{"date":"2024-10-20","name":"Suffolk County Half Marathon","sec":7969,"mi":13.2,"placing":"","source":"ICU","category":"Half","pr":false,"official":null},{"date":"2025-05-25","name":"Boston's Run To Remember Half Marathon","sec":6947,"mi":13.1,"placing":"","source":"TP","category":"Half","pr":false,"official":null},{"date":"2025-07-27","name":"NYRR Team Championships 5M","sec":2635,"mi":5.05,"placing":"136/225","source":"TP","category":"5M","pr":false,"official":{"name":"2025 NYRR Team Championship 5M","date":"2025-07-27","sec":2635,"overall":2599,"gender":1831,"agegroup":136,"agtime":2313,"agpct":0.553}},{"date":"2025-09-14","name":"Bronx 10M","sec":5378,"mi":9.99,"placing":"","source":"ICU","category":"10M","pr":false,"official":{"name":"2025 New Balance Bronx 10M","date":"2025-09-14","sec":5380,"overall":5565,"gender":4005,"agegroup":288,"agtime":4732,"agpct":0.558}},{"date":"2025-11-01","name":"Abbott Dash to the Finish Line 5K","sec":1458,"mi":3.1,"placing":"54/443","source":"TP","category":"5K","pr":false,"official":{"name":"2025 Abbott Dash to the Finish Line 5K and USATF Youth Championships","date":"2025-11-01","sec":1458,"overall":1623,"gender":1258,"agegroup":54,"agtime":1257,"agpct":0.6199}},{"date":"2026-04-12","name":"NYRR Run As One","sec":1910,"mi":3.98,"placing":"96/228","source":"TP","category":"4M","pr":false,"official":{"name":"2026 Run as One 4M Presented by JPMorgan Chase","date":"2026-04-12","sec":1904,"overall":2294,"gender":1852,"agegroup":97,"agtime":1650,"agpct":0.6146}},{"date":"2026-05-16","name":"Brooklyn Half","sec":7298,"mi":13.34,"placing":"","source":"ICU","category":"Half","pr":false,"official":{"name":"2026 RBC Brooklyn Half","date":"2026-05-16","sec":7291,"overall":14285,"gender":9884,"agegroup":574,"agtime":6347,"agpct":0.552}}];
+
+const PACE_ROWS = [
+  {dist:"400m", last365:"1:40 (6:42/mi)", allTime:"0:39 (2:37/mi)*", allFaster:true},
+  {dist:"800m", last365:"3:28 (6:58/mi)", allTime:"2:42 (5:26/mi)", allFaster:true},
+  {dist:"1.5k", last365:"6:45 (7:15/mi)", allTime:"6:07 (6:34/mi)", allFaster:true},
+  {dist:"1 mi", last365:"7:19", allTime:"6:34", allFaster:true},
+  {dist:"3k", last365:"13:37 (7:18/mi)", allTime:"13:51 (7:26/mi)", allFaster:false},
+  {dist:"5k", last365:"23:12 (7:28/mi)", allTime:"23:12 (7:28/mi)", allFaster:null},
+  {dist:"10k", last365:"54:49 (8:49/mi)", allTime:"47:34 (7:39/mi)", allFaster:true},
+  {dist:"Half", last365:"1:59:25 (9:07/mi)", allTime:"1:47:25 (8:12/mi)", allFaster:true},
+  {dist:"Marathon", last365:"—", allTime:"4:12:14 (9:37/mi)", allFaster:true},
+];
+
+const SNAPSHOT_DATE = "2026-07-24";
+document.getElementById('snapshot-date').textContent = "Jul 24, 2026";
+
+// Peak Performance — Run column date ranges: "Last 365 Days" is a rolling window
+// ending on the snapshot date; "All-Time" is Intervals' custom season, Jan 1 2015 to snapshot.
+function fmtShort(d){
+  return d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+}
+(function(){
+  const snapshot = new Date(SNAPSHOT_DATE+'T00:00:00');
+  const last365Start = new Date(snapshot);
+  last365Start.setDate(last365Start.getDate()-365);
+  const allTimeStart = new Date('2015-01-01T00:00:00');
+  document.getElementById('l365-range').textContent = `${fmtShort(last365Start)} – ${fmtShort(snapshot)}`;
+  document.getElementById('alltime-range').textContent = `${fmtShort(allTimeStart)} – ${fmtShort(snapshot)}`;
+})();
+
+// Header PR stats are computed from the actual Race Reports data (real races only),
+// not the modeled Peak Pace curve — those two can legitimately differ slightly.
+function bestInCategory(cat){
+  const rows = RACES.filter(r => r.category === cat && r.sec);
+  if(!rows.length) return null;
+  return rows.reduce((a,b) => a.sec < b.sec ? a : b);
+}
+(function(){
+  const m = bestInCategory('Marathon');
+  const h = bestInCategory('Half');
+  if(m){
+    document.getElementById('stat-marathon').textContent = hms(m.sec);
+    document.getElementById('stat-marathon-lbl').textContent = `Marathon PR (${m.name}, ${m.date.slice(0,4)})`;
+  }
+  if(h){
+    document.getElementById('stat-half').textContent = hms(h.sec);
+    document.getElementById('stat-half-lbl').textContent = `Half PR (${h.name}, ${h.date.slice(0,4)})`;
+  }
+  const agRows = RACES.filter(r => r.official && r.official.agpct != null);
+  if(agRows.length){
+    const best = agRows.reduce((a,b) => a.official.agpct > b.official.agpct ? a : b);
+    document.getElementById('bib-hero-num').textContent = (best.official.agpct*100).toFixed(1)+'%';
+    document.getElementById('bib-hero-lbl').textContent = `best age-graded · ${best.name}, ${best.date.slice(0,4)}`;
+  }
+})();
+
+const paceBody = document.getElementById('pace-table');
+PACE_ROWS.forEach(r=>{
+  const tr = document.createElement('tr');
+  const lastCls = r.allFaster===false ? 'better' : '';
+  const allCls = r.allFaster===true ? 'better' : '';
+  tr.innerHTML = `<td>${r.dist}</td><td class="mono ${lastCls}">${r.last365}</td><td class="mono ${allCls}">${r.allTime}</td>`;
+  paceBody.appendChild(tr);
+});
+
+function hms(sec){
+  if(sec===null||sec===undefined) return "—";
+  sec = Math.round(sec);
+  const h = Math.floor(sec/3600), m = Math.floor((sec%3600)/60), s = sec%60;
+  const mm = h ? String(m).padStart(2,'0') : m;
+  const ss = String(s).padStart(2,'0');
+  return h ? `${h}:${mm}:${ss}` : `${mm}:${ss}`;
+}
+function paceStr(sec, mi){
+  if(!sec || !mi) return "—";
+  const p = Math.round(sec/mi);
+  const m = Math.floor(p/60), s = p%60;
+  return `${m}:${String(s).padStart(2,'0')}`;
+}
+function srcDot(source){
+  if(source==='ICU' || source==='ICU-partial') return '<span class="src-dot icu" title="Filled from Intervals — TrainingPeaks had no data"></span>';
+  if(source==='TP+ICU') return '<span class="src-dot mix" title="Duration from TrainingPeaks, distance from Intervals"></span>';
+  if(source==='none') return '<span class="src-dot none" title="Registered but not run — no result"></span>';
+  return '';
+}
+
+RACES.forEach(r=>{
+  r.pace = (r.sec && r.mi) ? r.sec/r.mi : null;
+  r.offsec = r.official ? r.official.sec : null;
+  r.offplace = r.official ? r.official.overall : null;
+  r.agpct = r.official ? r.official.agpct : null;
+});
+
+function placeStr(o){
+  if(!o) return '—';
+  const parts = [];
+  if(o.overall!=null) parts.push('O:'+o.overall);
+  if(o.gender!=null) parts.push('G:'+o.gender);
+  if(o.agegroup!=null) parts.push('AG:'+o.agegroup);
+  return parts.length ? parts.join(' · ') : '—';
+}
+function agStr(o){
+  if(!o || o.agtime==null) return '—';
+  const pct = o.agpct!=null ? ` (${(o.agpct*100).toFixed(1)}%)` : '';
+  return `${hms(o.agtime)}${pct}`;
+}
+
+// ---------- Personal Bests grid ----------
+const pbGrid = document.getElementById('pb-grid');
+const catOrderPB = ['Mile','4M','5K','8K','5M','10K','15K','10M','Half','Marathon'];
+const prRaces = RACES.filter(r => r.pr).sort((a,b)=>catOrderPB.indexOf(a.category)-catOrderPB.indexOf(b.category));
+pbGrid.innerHTML = prRaces.map(r=>{
+  const dateStr = new Date(r.date+'T00:00:00').toLocaleDateString('en-US',{month:'short',year:'numeric'});
+  return `<div class="pbcard">
+    <div class="pbcard-cat">${r.category}</div>
+    <div class="pbcard-name">${r.name}</div>
+    <div class="pbcard-date">${dateStr}</div>
+    <div class="pbcard-time">${hms(r.sec)}<small>${paceStr(r.sec,r.mi)}/mi</small></div>
+    <div class="pbcard-meta">
+      <span><b>${placeStr(r.official)}</b></span>
+      <span>AG ${agStr(r.official)}</span>
+    </div>
+  </div>`;
+}).join('');
+
+let sortKey='date', sortDir=1;
+const searchEl = document.getElementById('search');
+const yearEl = document.getElementById('year-filter');
+const countEl = document.getElementById('row-count');
+const raceBody = document.getElementById('race-table');
+
+const years = [...new Set(RACES.map(r=>r.date.slice(0,4)))].sort();
+years.forEach(y=>{ const o=document.createElement('option'); o.value=y; o.textContent=y; yearEl.appendChild(o); });
+const cats = [...new Set(RACES.map(r=>r.category))].sort();
+const catOrder = ['Mile','4M','5K','8K','5M','10K','15K','10M','Half','Marathon','Other'];
+cats.sort((a,b)=>catOrder.indexOf(a)-catOrder.indexOf(b));
+
+// ---------- distance quick-filter chips ----------
+let activeCat = '';
+const chipRow = document.getElementById('chip-row');
+function buildChips(){
+  const chips = ['All', ...cats];
+  chipRow.innerHTML = chips.map(c=>{
+    const val = c==='All' ? '' : c;
+    const active = (val===activeCat) ? 'active' : '';
+    return `<button type="button" class="chip ${active}" data-val="${val}">${c}</button>`;
+  }).join('');
+  chipRow.querySelectorAll('.chip').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      activeCat = btn.dataset.val;
+      buildChips();
+      render();
+    });
+  });
+}
+buildChips();
+
+function render(){
+  const q = searchEl.value.trim().toLowerCase();
+  const yf = yearEl.value;
+  const cf = activeCat;
+  let rows = RACES.filter(r=>{
+    if(q && !r.name.toLowerCase().includes(q)) return false;
+    if(yf && r.date.slice(0,4)!==yf) return false;
+    if(cf && r.category!==cf) return false;
+    return true;
+  });
+  rows.sort((a,b)=>{
+    let av=a[sortKey], bv=b[sortKey];
+    if(sortKey==='offplace'){
+      av = (a.official && a.official.overall!=null) ? a.official.overall : Infinity;
+      bv = (b.official && b.official.overall!=null) ? b.official.overall : Infinity;
+    }
+    if(av===null||av===undefined) av = (sortKey==='sec'||sortKey==='pace'||sortKey==='offsec'||sortKey==='agpct') ? Infinity : '';
+    if(bv===null||bv===undefined) bv = (sortKey==='sec'||sortKey==='pace'||sortKey==='offsec'||sortKey==='agpct') ? Infinity : '';
+    if(av<bv) return -1*sortDir;
+    if(av>bv) return 1*sortDir;
+    return 0;
+  });
+  raceBody.innerHTML = rows.map(r=>{
+    const prBadge = r.pr ? '<span class="pr-badge">PR</span>' : '';
+    const dot = srcDot(r.source);
+    return `<tr>
+      <td class="mono">${r.date}</td>
+      <td>${r.name}${prBadge}${dot}</td>
+      <td>${r.category}</td>
+      <td class="mono">${hms(r.sec)}</td>
+      <td class="mono">${paceStr(r.sec,r.mi)}</td>
+      <td class="mono">${r.offsec!=null ? hms(r.offsec) : '—'}</td>
+      <td>${placeStr(r.official)}</td>
+      <td class="mono">${agStr(r.official)}</td>
+    </tr>`;
+  }).join('');
+  countEl.textContent = `${rows.length} of ${RACES.length} races`;
+}
+
+document.querySelectorAll('th.sortable').forEach(th=>{
+  th.addEventListener('click', ()=>{
+    const key = th.dataset.key;
+    if(sortKey===key){ sortDir*=-1; } else { sortKey=key; sortDir=1; }
+    document.querySelectorAll('th.sortable').forEach(t=>t.classList.remove('active'));
+    th.classList.add('active');
+    th.querySelector('.arrow').textContent = sortDir===1 ? '↑' : '↓';
+    render();
+  });
+});
+searchEl.addEventListener('input', render);
+yearEl.addEventListener('change', render);
+
+render();
+</script>
+
+</body>
+</html>
