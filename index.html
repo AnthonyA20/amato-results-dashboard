@@ -353,7 +353,7 @@
 
   <section class="block">
     <div class="section-head"><span class="section-tag">03</span><h2 class="section-title">Race Reports</h2></div>
-    <p class="section-note">All 67 races from the original TrainingPeaks Race Reports widget, 2015–2026, cross-referenced against your official New York Road Runners results export — 57 of 67 are NYRR-scored races and now carry a verified <b>Official Result</b> (chip time, Overall / Gender / Age-Group place, age-graded time). Where TrainingPeaks had no duration/distance on file, the "My Time" column is filled from the matching imported activity file (blue dot). The Chicago Marathon (10/7/2018) was registered but never run, so there's no result — not an export gap. The Central Park Duathlon total sums three run + two bike segments recorded that morning.</p>
+    <p class="section-note">All <span id="rr-total">68</span> races in the log, seeded from the original TrainingPeaks Race Reports widget and cross-referenced against your official New York Road Runners results export — <span id="rr-official">59</span> are NYRR-scored and carry a verified <b>Official Result</b> (chip time, Overall / Gender / Age-Group place, age-graded time). Where TrainingPeaks had no duration/distance on file, the "My Time" column is filled from the matching imported activity file (blue dot). The Central Park Duathlon total sums three run + two bike segments recorded that morning.</p>
 
     <div class="chip-row" id="chip-row"></div>
     <div class="controls">
@@ -427,6 +427,11 @@ const PACE_ROWS = [
 
 const SNAPSHOT_DATE = "2026-10-11";
 document.getElementById('snapshot-date').textContent = "Oct 11, 2026";
+
+// Keep the Race Reports intro counts in sync with the RACES array, which the
+// weekly refresh regenerates — so these numbers can never go stale again.
+document.getElementById('rr-total').textContent = RACES.length;
+document.getElementById('rr-official').textContent = RACES.filter(r => r.official).length;
 
 // Peak Performance — Run column date ranges: "Last 365 Days" is a rolling window
 // ending on the snapshot date; "All-Time" is Intervals' custom season, Jan 1 2015 to snapshot.
